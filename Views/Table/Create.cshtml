@@ -1,0 +1,38 @@
+﻿@model RestaurantReservationSystem.Models.Table
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>Yeni Masa Ekle</h2>
+            <h5 class="text-muted">@ViewBag.RestaurantName</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="RestaurantId" />
+
+                <div class="form-group mb-3">
+                    <label asp-for="TableNumber" class="control-label">Masa Numarası</label>
+                    <input asp-for="TableNumber" class="form-control" />
+                    <span asp-validation-for="TableNumber" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Capacity" class="control-label">Kapasite</label>
+                    <input asp-for="Capacity" class="form-control" type="number" min="1" max="20" />
+                    <span asp-validation-for="Capacity" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Masa Ekle</button>
+                    <a asp-controller="Restaurant" asp-action="Details" asp-route-id="@Model.RestaurantId"
+                       class="btn btn-secondary">Geri Dön</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

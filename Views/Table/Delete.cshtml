@@ -1,0 +1,40 @@
+﻿@model RestaurantReservationSystem.Models.Table
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h2>Masa Sil</h2>
+            <h5>@ViewBag.RestaurantName</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <h4>Bu masayı silmek istediğinizden emin misiniz?</h4>
+                <p>Bu işlem geri alınamaz.</p>
+            </div>
+
+            <dl class="row">
+                <dt class="col-sm-3">Masa Numarası</dt>
+                <dd class="col-sm-9">@Model.TableNumber</dd>
+
+                <dt class="col-sm-3">Kapasite</dt>
+                <dd class="col-sm-9">@Model.Capacity kişilik</dd>
+
+                <dt class="col-sm-3">Durum</dt>
+                <dd class="col-sm-9">
+                    <span class="badge @(Model.IsAvailable ? "bg-success" : "bg-danger")">
+                        @(Model.IsAvailable ? "Müsait" : "Dolu")
+                    </span>
+                </dd>
+            </dl>
+
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="Id" />
+                <div class="form-group">
+                    <button type="submit" class="btn btn-danger">Sil</button>
+                    <a asp-controller="Restaurant" asp-action="Details" asp-route-id="@Model.RestaurantId"
+                       class="btn btn-secondary">Geri Dön</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

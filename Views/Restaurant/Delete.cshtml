@@ -1,0 +1,35 @@
+﻿@model Restaurant
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h2>Restoran Silme</h2>
+        </div>
+        <div class="card-body">
+            <h3>Bu restoranı silmek istediğinizden emin misiniz?</h3>
+            <div class="mt-4">
+                <dl class="row">
+                    <dt class="col-sm-3">Restoran Adı</dt>
+                    <dd class="col-sm-9">@Model.Name</dd>
+
+                    <dt class="col-sm-3">Adres</dt>
+                    <dd class="col-sm-9">@Model.Address</dd>
+
+                    <dt class="col-sm-3">Mutfak Türü</dt>
+                    <dd class="col-sm-9">@Model.Cuisine</dd>
+
+                    <dt class="col-sm-3">İletişim</dt>
+                    <dd class="col-sm-9">@Model.ContactNumber</dd>
+                </dl>
+            </div>
+
+            <form asp-action="Delete" class="mt-3">
+                <input type="hidden" asp-for="Id" />
+                <div class="btn-group">
+                    <input type="submit" value="Sil" class="btn btn-danger" />
+                    <a asp-action="Index" class="btn btn-secondary">Listeye Dön</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

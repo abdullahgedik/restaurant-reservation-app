@@ -1,0 +1,274 @@
+﻿@model RestaurantReservationSystem.Models.Restaurant
+@inject UserManager<IdentityUser> UserManager
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>@Model.Name</h2>
+        </div>
+        <div class="card-body">
+            <!-- Restoran detayları -->
+            <div class="row">
+                <div class="col-md-8">
+                    <dl class="row">
+                        <dt class="col-sm-3">Adres</dt>
+                        <dd class="col-sm-9">@Model.Address</dd>
+
+                        <dt class="col-sm-3">Mutfak Türü</dt>
+                        <dd class="col-sm-9">@Model.Cuisine</dd>
+
+                        <dt class="col-sm-3">İletişim</dt>
+                        <dd class="col-sm-9">@Model.ContactNumber</dd>
+
+                        <dt class="col-sm-3">Puan</dt>
+                        <dd class="col-sm-9">
+                            <div class="text-warning">
+                                @{
+                                    int fullStars = (int)Model.Rating;
+                                    bool hasHalfStar = Model.Rating - fullStars >= 0.5m;
+                                }
+
+                                @for (int i = 0; i < fullStars; i++)
+                                {
+                                    <i class="fas fa-star"></i>
+                                }
+
+                                @if (hasHalfStar)
+                                {
+                                    <i class="fas fa-star-half-alt"></i>
+                                }
+
+                                @for (int i = (hasHalfStar ? fullStars + 1 : fullStars); i < 5; i++)
+                                {
+                                    <i class="far fa-star"></i>
+                                }
+                                <span class="ms-2">(@Model.Rating.ToString("0.0"))</span>
+                            </div>
+                        </dd>
+
+                        <dt class="col-sm-3">Açıklama</dt>
+                        <dd class="col-sm-9">@Model.Description</dd>
+
+                        <dt class="col-sm-3">Restoran Sahibi</dt>
+                        <dd class="col-sm-9">@(Model.User?.Email ?? "Belirtilmemiş")</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Masalar kısmı -->
+            <div class="mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4>Masalar (@(Model.Tables?.Count ?? 0))</h4>
+                    @if (Model.UserId == UserManager.GetUserId(User))
+                    {
+                        <a asp-controller="Table" asp-action="Create" asp-route-restaurantId="@Model.Id"
+                           class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Yeni Masa Ekle
+                        </a>
+                    }
+                </div>
+
+                @if (Model.Tables != null && Model.Tables.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Masa No</th>
+                                    <th>Kapasite</th>
+                                    <th>Durum</th>
+                                    @if (Model.UserId == UserManager.GetUserId(User))
+                                    {
+                                        <th>İşlemler</th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var table in Model.Tables)
+                                {
+                                    <tr>
+                                        <td>@table.TableNumber</td>
+                                        <td>@table.Capacity kişilik</td>
+                                        <td>
+                                            <span class="badge @(table.IsAvailable ? "bg-success" : "bg-danger")">
+                                                @(table.IsAvailable ? "Müsait" : "Dolu")
+                                            </span>
+                                        </td>
+                                        @if (Model.UserId == UserManager.GetUserId(User))
+                                        {
+                                            <td>
+                                                <div class="btn-group">
+                                                    <a asp-controller="Table" asp-action="Edit" asp-route-id="@table.Id"
+                                                       class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a asp-controller="Table" asp-action="Delete" asp-route-id="@table.Id"
+                                                       class="btn btn-sm btn-outline-danger">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        <h5>Henüz Masa Eklenmemiş</h5>
+                        @if (Model.UserId == UserManager.GetUserId(User))
+                        {
+                            <p>Restoranınıza masa eklemek için yukarıdaki butonu kullanabilirsiniz.</p>
+                        }
+                        else
+                        {
+                            <p>Bu restoranda henüz masa bulunmamaktadır.</p>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Değerlendirmeler kısmı -->
+            <div class="mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4>Değerlendirmeler</h4>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <a asp-controller="Review" asp-action="Create" asp-route-restaurantId="@Model.Id"
+                           class="btn btn-primary btn-sm">
+                            <i class="fas fa-star"></i> Değerlendirme Yap
+                        </a>
+                    }
+                </div>
+
+                @if (Model.Reviews != null && Model.Reviews.Any())
+                {
+                    foreach (var review in Model.Reviews.OrderByDescending(r => r.ReviewDate))
+                    {
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="card-subtitle mb-2 text-muted">@review.User?.Email</h6>
+                                    <small class="text-muted">@review.ReviewDate.ToString("dd.MM.yyyy HH:mm")</small>
+                                </div>
+                                <div class="text-warning mb-2">
+                                    @for (int i = 0; i < review.Rating; i++)
+                                    {
+                                        <i class="fas fa-star"></i>
+                                    }
+                                    @for (int i = review.Rating; i < 5; i++)
+                                    {
+                                        <i class="far fa-star"></i>
+                                    }
+                                </div>
+                                <p class="card-text">@review.Comment</p>
+                                @if (User.Identity.IsAuthenticated && review.UserId == UserManager.GetUserId(User))
+                                {
+                                    <div class="btn-group">
+                                        <a asp-controller="Review" asp-action="Edit" asp-route-id="@review.Id"
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-edit"></i> Düzenle
+                                        </a>
+                                        <a asp-controller="Review" asp-action="Delete" asp-route-id="@review.Id"
+                                           class="btn btn-outline-danger btn-sm">
+                                            <i class="fas fa-trash"></i> Sil
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        <p class="mb-0">Henüz değerlendirme yapılmamış.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Footer kısmı -->
+        <div class="card-footer">
+            <div class="btn-group">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <button id="favoriteButton" type="button" class="btn btn-outline-danger" data-restaurant-id="@Model.Id">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                }
+                @if (User.Identity.IsAuthenticated && Model.UserId == UserManager.GetUserId(User))
+                {
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Düzenle</a>
+                }
+                <a asp-action="Index" class="btn btn-secondary">Listeye Dön</a>
+                @if (User.Identity.IsAuthenticated && Model.Tables != null && Model.Tables.Any(t => t.IsAvailable))
+                {
+                    <a asp-controller="Reservation"
+                       asp-action="Create"
+                       asp-route-restaurantId="@Model.Id"
+                       class="btn btn-success">
+                        <i class="fas fa-calendar-plus"></i> Rezervasyon Yap
+                    </a>
+                }
+                else if (User.Identity.IsAuthenticated && Model.Tables != null && !Model.Tables.Any(t => t.IsAvailable))
+                {
+                    <button class="btn btn-secondary" disabled>
+                        <i class="fas fa-calendar-times"></i> Müsait Masa Yok
+                    </button>
+                }
+                else if (!User.Identity.IsAuthenticated)
+                {
+                    <a asp-controller="Account"
+                       asp-action="Login"
+                       asp-route-returnUrl="@Url.Action("Details", "Restaurant", new { id = Model.Id })"
+                       class="btn btn-info">
+                        <i class="fas fa-sign-in-alt"></i> Rezervasyon için Giriş Yapın
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var restaurantId = @Model.Id;
+
+            // Sayfa yüklendiğinde favori durumunu kontrol et
+            $.get('/Favorite/CheckStatus', { restaurantId: restaurantId })
+                .done(function (response) {
+                    updateFavoriteButton(response.isFavorite);
+                });
+
+            // Favori butonuna tıklama
+            $('#favoriteButton').click(function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: '/Favorite/Toggle',
+                    type: 'POST',
+                    data: { restaurantId: restaurantId },
+                    success: function (response) {
+                        updateFavoriteButton(response.isFavorite);
+                    },
+                    error: function () {
+                        alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                    }
+                });
+            });
+
+            function updateFavoriteButton(isFavorite) {
+                var button = $('#favoriteButton');
+                if (isFavorite) {
+                    button.addClass('active').addClass('btn-danger').removeClass('btn-outline-danger');
+                } else {
+                    button.removeClass('active').removeClass('btn-danger').addClass('btn-outline-danger');
+                }
+            }
+        });
+    </script>
+}

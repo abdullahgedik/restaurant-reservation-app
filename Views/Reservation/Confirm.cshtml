@@ -1,0 +1,13 @@
+﻿@model RestaurantReservationSystem.Models.Reservation
+
+<h2>Rezervasyon Onayı</h2>
+
+<div class="alert alert-success">
+    <h3>Rezervasyonunuz Alındı!</h3>
+    <p>Restoran: @Model.Restaurant.Name</p>
+    <p>Tarih: @Model.ReservationDate</p>
+    <p>Masa: @Model.Table.TableNumber</p>
+    <p>Kişi Sayısı: @Model.GuestCount</p>
+</div>
+
+<a asp-controller="Reservation" asp-action="Index" class="btn btn-primary">Rezervasyonlarıma Dön</a>

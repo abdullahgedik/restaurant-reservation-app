@@ -1,0 +1,98 @@
+﻿@model IEnumerable<RestaurantReservationSystem.Models.Favorite>
+@inject UserManager<IdentityUser> UserManager
+
+<div class="container mt-4">
+    <h2>Favori Restoranlarım</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            <h5>Henüz favori restoranınız bulunmamaktadır.</h5>
+            <p>Beğendiğiniz restoranları favorilerinize ekleyebilirsiniz.</p>
+            <a asp-controller="Restaurant" asp-action="Index" class="btn btn-primary">
+                <i class="fas fa-utensils"></i> Restoranları Görüntüle
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var favorite in Model)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <h5 class="card-title">@favorite.Restaurant.Name</h5>
+                                <button class="btn btn-link text-danger remove-favorite"
+                                        data-restaurant-id="@favorite.Restaurant.Id">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                            </div>
+                            <h6 class="card-subtitle mb-2 text-muted">@favorite.Restaurant.Cuisine</h6>
+
+                            <div class="text-warning mb-2">
+                                @{
+                                    int fullStars = (int)favorite.Restaurant.Rating;
+                                    bool hasHalfStar = favorite.Restaurant.Rating - fullStars >= 0.5m;
+                                }
+
+                                @for (int i = 0; i < fullStars; i++)
+                                {
+                                    <i class="fas fa-star"></i>
+                                }
+
+                                @if (hasHalfStar)
+                                {
+                                    <i class="fas fa-star-half-alt"></i>
+                                }
+
+                                @for (int i = (hasHalfStar ? fullStars + 1 : fullStars); i < 5; i++)
+                                {
+                                    <i class="far fa-star"></i>
+                                }
+                                <span class="ms-2">(@favorite.Restaurant.Rating.ToString("0.0"))</span>
+                            </div>
+
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    <i class="fas fa-map-marker-alt"></i> @favorite.Restaurant.Address
+                                </small>
+                            </p>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <a asp-controller="Restaurant" asp-action="Details"
+                               asp-route-id="@favorite.Restaurant.Id"
+                               class="btn btn-outline-primary w-100">
+                                <i class="fas fa-info-circle"></i> Detaylar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.remove-favorite').click(function () {
+                var button = $(this);
+                var restaurantId = button.data('restaurant-id');
+
+                $.post('/Favorite/Toggle', { restaurantId: restaurantId })
+                    .done(function (response) {
+                        if (!response.isFavorite) {
+                            button.closest('.col-md-6').fadeOut(function () {
+                                $(this).remove();
+                                if ($('.col-md-6').length === 0) {
+                                    location.reload();
+                                }
+                            });
+                        }
+                    });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,147 @@
+﻿@model IEnumerable<RestaurantReservationSystem.Models.Restaurant>
+@inject UserManager<IdentityUser> UserManager
+
+<div class="container mt-4">
+    <!-- Arama ve Filtreleme Formu -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form asp-action="Search" method="get" class="row g-3">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" name="searchTerm" class="form-control" 
+                               placeholder="Restoran ara..." value="@ViewBag.SearchTerm">
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <select name="cuisine" class="form-select">
+                        <option value="">Tüm Mutfaklar</option>
+                        @foreach (var cuisine in ViewBag.Cuisines ?? new List<string>())
+                        {
+                                <option value="@cuisine" selected="@(cuisine == ViewBag.SelectedCuisine)">
+                                @cuisine
+                                </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <select name="minRating" class="form-select">
+                        <option value="">Minimum Puan</option>
+                        @for (int i = 5; i >= 1; i--)
+                        {
+                                <option value="@i" selected="@(i == ViewBag.MinRating)">
+                                @i yıldız ve üzeri
+                                </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> Ara
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Restoran Listesi -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Restoranlar</h2>
+        @if (User.Identity.IsAuthenticated)
+        {
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Yeni Restoran Ekle
+                </a>
+        }
+    </div>
+
+    @if (!Model.Any())
+    {
+            <div class="alert alert-info">
+                <h5>Restoran Bulunamadı</h5>
+                <p>Arama kriterlerinize uygun restoran bulunmamaktadır.</p>
+            </div>
+    }
+    else
+    {
+            <div class="row">
+            @foreach (var restaurant in Model)
+            {
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">@restaurant.Name</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">@restaurant.Cuisine</h6>
+
+                                    <div class="text-warning mb-2">
+                                @{
+                                    int fullStars = (int)restaurant.Rating;
+                                    bool hasHalfStar = restaurant.Rating - fullStars >= 0.5m;
+                                }
+
+                                @for (int i = 0; i < fullStars; i++)
+                                {
+                                                <i class="fas fa-star"></i>
+                                }
+
+                                @if (hasHalfStar)
+                                {
+                                                <i class="fas fa-star-half-alt"></i>
+                                }
+
+                                @for (int i = (hasHalfStar ? fullStars + 1 : fullStars); i < 5; i++)
+                                {
+                                                <i class="far fa-star"></i>
+                                }
+                                        <span class="ms-2">(@restaurant.Rating.ToString("0.0"))</span>
+                                    </div>
+
+                                    <p class="card-text">@(restaurant.Description?.Length > 100 ? restaurant.Description.Substring(0, 100) + "..." : restaurant.Description)</p>
+                                    <p class="card-text">
+                                        <small class="text-muted">
+                                            <i class="fas fa-map-marker-alt"></i> @restaurant.Address
+                                        </small>
+                                    </p>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="btn-group w-100">
+                                        <a asp-action="Details" asp-route-id="@restaurant.Id" 
+                                           class="btn btn-outline-primary">
+                                            <i class="fas fa-info-circle"></i> Detaylar
+                                        </a>
+                                @if (User.Identity.IsAuthenticated && restaurant.UserId == UserManager.GetUserId(User))
+                                {
+                                                <a asp-action="Edit" asp-route-id="@restaurant.Id" 
+                                                   class="btn btn-outline-secondary">
+                                                    <i class="fas fa-edit"></i> Düzenle
+                                                </a>
+                                }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+            }
+            </div>
+    }
+</div>
+
+@section Scripts {
+        <script>
+            // Form submit olmadan önce boş değerleri temizle
+            document.querySelector('form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                var inputs = this.querySelectorAll('input, select');
+                inputs.forEach(function(input) {
+                    if (!input.value) {
+                        input.disabled = true;
+                    }
+                });
+                this.submit();
+            });
+        </script>
+}

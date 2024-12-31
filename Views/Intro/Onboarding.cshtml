@@ -1,0 +1,124 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hoş Geldiniz - Restoran Rezervasyon</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .onboarding-container {
+            max-width: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .features-row {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 2rem;
+        }
+
+        .feature {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 4rem;
+            color: #FF6B6B;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #343a40;
+        }
+
+        .feature-description {
+            color: #6c757d;
+        }
+
+        .btn-get-started {
+            margin-top: 2rem;
+            padding: 0.75rem 2rem;
+            font-size: 1.1rem;
+            background-color: #FF6B6B;
+            border-color: #FF6B6B;
+            color: white;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+            .btn-get-started:hover {
+                background-color: #ff5252;
+                border-color: #ff5252;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            }
+    </style>
+</head>
+<body>
+    <div class="onboarding-container">
+        <div class="features-row">
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h2 class="feature-title">Restoran Keşfet</h2>
+                <p class="feature-description">
+                    Çevrenizdeki en iyi restoranları keşfedin,
+                    değerlendirmeleri okuyun ve size en uygun mekanı bulun.
+                </p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <h2 class="feature-title">Rezervasyon Yap</h2>
+                <p class="feature-description">
+                    Seçtiğiniz restoranda kolayca masa rezervasyonu yapın,
+                    özel isteklerinizi belirtin.
+                </p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h2 class="feature-title">Değerlendir ve Paylaş</h2>
+                <p class="feature-description">
+                    Deneyimlerinizi paylaşın, diğer kullanıcılara yardımcı olun
+                    ve topluluğun bir parçası olun.
+                </p>
+            </div>
+        </div>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-get-started">
+            Başlayalım
+        </a>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit.js"></script>
+</body>
+</html>

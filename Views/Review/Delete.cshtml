@@ -1,0 +1,47 @@
+﻿@model RestaurantReservationSystem.Models.Review
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h2>Değerlendirme Sil</h2>
+            <h5>@Model.Restaurant.Name</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <h4>Bu değerlendirmeyi silmek istediğinizden emin misiniz?</h4>
+                <p>Bu işlem geri alınamaz.</p>
+            </div>
+
+            <dl class="row">
+                <dt class="col-sm-3">Değerlendirme Tarihi</dt>
+                <dd class="col-sm-9">@Model.ReviewDate.ToString("dd.MM.yyyy HH:mm")</dd>
+
+                <dt class="col-sm-3">Puan</dt>
+                <dd class="col-sm-9">
+                    <div class="text-warning">
+                        @for (int i = 0; i < Model.Rating; i++)
+                        {
+                            <i class="fas fa-star"></i>
+                        }
+                    </div>
+                </dd>
+
+                <dt class="col-sm-3">Yorum</dt>
+                <dd class="col-sm-9">@Model.Comment</dd>
+            </dl>
+
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="Id" />
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Sil
+                    </button>
+                    <a asp-controller="Restaurant" asp-action="Details" asp-route-id="@Model.RestaurantId"
+                       class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri Dön
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

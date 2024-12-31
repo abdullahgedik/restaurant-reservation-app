@@ -1,0 +1,101 @@
+﻿@model IEnumerable<RestaurantReservationSystem.Models.Reservation>
+
+<div class="container mt-4">
+    <h2>Rezervasyonlarım</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            <h5>Henüz rezervasyonunuz bulunmamaktadır.</h5>
+            <p>Restoran listesinden rezervasyon yapabilirsiniz.</p>
+            <a asp-controller="Restaurant" asp-action="Index" class="btn btn-primary">
+                <i class="fas fa-utensils"></i> Restoranları Görüntüle
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var reservation in Model)
+            {
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">@reservation.Restaurant.Name</h5>
+                        </div>
+                        <div class="card-body">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Tarih ve Saat</dt>
+                                <dd class="col-sm-8">@reservation.ReservationDate.ToString("dd.MM.yyyy HH:mm")</dd>
+
+                                <dt class="col-sm-4">Masa</dt>
+                                <dd class="col-sm-8">@reservation.Table.TableNumber</dd>
+
+                                <dt class="col-sm-4">Kişi Sayısı</dt>
+                                <dd class="col-sm-8">@reservation.GuestCount kişi</dd>
+
+                                <dt class="col-sm-4">Durum</dt>
+                                <dd class="col-sm-8">
+                                    @{
+                                        var badgeClass = reservation.Status switch
+                                        {
+                                            ReservationStatus.Pending => "bg-warning",
+                                            ReservationStatus.Confirmed => "bg-success",
+                                            ReservationStatus.Cancelled => "bg-danger",
+                                            _ => "bg-secondary"
+                                        };
+
+                                        var statusText = reservation.Status switch
+                                        {
+                                            ReservationStatus.Pending => "Beklemede",
+                                            ReservationStatus.Confirmed => "Onaylandı",
+                                            ReservationStatus.Cancelled => "İptal Edildi",
+                                            _ => "Bilinmiyor"
+                                        };
+                                    }
+                                    <span class="badge @badgeClass">@statusText</span>
+                                </dd>
+                            </dl>
+                        </div>
+                        <div class="card-footer">
+                            <div class="btn-group">
+                                @if (reservation.Status != ReservationStatus.Cancelled &&
+                               reservation.ReservationDate > DateTime.Now)
+                                {
+                                    <form asp-action="Cancel" asp-route-id="@reservation.Id"
+                                          onsubmit="return confirm('Rezervasyonu iptal etmek istediğinizden emin misiniz?');">
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-times"></i> İptal Et
+                                        </button>
+                                    </form>
+                                }
+                                <a asp-controller="Restaurant" asp-action="Details"
+                                   asp-route-id="@reservation.RestaurantId"
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-info-circle"></i> Restoran Detayları
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Bootstrap alert'lerinin otomatik kapanması için
+        setTimeout(function () {
+            $('.alert').alert('close');
+        }, 5000);
+    </script>
+}
